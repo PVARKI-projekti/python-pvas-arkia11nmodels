@@ -87,6 +87,8 @@ pre-commit = "^2.17"
 pytest-asyncio = "^0.18"
 bump2version = "^1.0"
 detect-secrets = "^1.2"
+pytest-docker = "^1.0"
+docker-compose = "^1.29"
 # required for development
 alembic = { version="^1.9", optional=false }
 psycopg2 = { version="^2.9", optional=false }

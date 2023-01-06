@@ -1,8 +1,13 @@
 """Read database configuration from ENV or .env -file"""
 from typing import Optional
+import logging
+
 from sqlalchemy.engine.url import URL, make_url
 from starlette.config import Config
 from starlette.datastructures import Secret
+
+LOGGER = logging.getLogger(__name__)
+
 
 config = Config(".env")
 
@@ -31,3 +36,7 @@ SSL: Optional[bool] = config("DB_SSL", default=None)
 USE_CONNECTION_FOR_REQUEST = config("DB_USE_CONNECTION_FOR_REQUEST", cast=bool, default=True)
 RETRY_LIMIT = config("DB_RETRY_LIMIT", cast=int, default=1)
 RETRY_INTERVAL = config("DB_RETRY_INTERVAL", cast=int, default=1)
+
+LOGGER.debug("DSN={}".format(DSN))
+LOGGER.debug("HOST={}".format(HOST))
+LOGGER.debug("DATABASE={}".format(DATABASE))

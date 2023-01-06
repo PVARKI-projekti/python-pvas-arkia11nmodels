@@ -13,7 +13,7 @@ class User(db.Model):
     __tablename__ = "users"
     __table_args__ = {"schema": "a11n"}
 
-    pk = sa.Column(saUUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    pk = sa.Column(saUUID(), primary_key=True, default=uuid.uuid4)
     email = sa.Column(sa.String(), nullable=False, index=True)
     sms = sa.Column(sa.String(), nullable=True, index=True)
     displayname = sa.Column(sa.Unicode(), nullable=False, default=lambda ctx: ctx.current_parameters.get("email"))
