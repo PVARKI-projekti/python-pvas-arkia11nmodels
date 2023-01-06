@@ -59,9 +59,9 @@ branch = true
 python = "^3.8"
 libadvian = "^1.0"
 click = "^8.0"
-gino = "^1.0.1"
-alembic = { version="^1.9.1", optional=true }
-psycopg2 = { version="^2.9.5", optional=true }
+gino = {version = "^1.0", extras = ["starlette"]}
+alembic = { version="^1.9", optional=true }
+psycopg2 = { version="^2.9", optional=true }
 
 [tool.poetry.extras]
 migrations = ["alembic", "psycopg2"]
@@ -80,8 +80,8 @@ pytest-asyncio = "^0.18"
 bump2version = "^1.0"
 detect-secrets = "^1.2"
 # required for development
-alembic = { version="^1.9.1", optional=false }
-psycopg2 = { version="^2.9.5", optional=false }
+alembic = { version="^1.9", optional=false }
+psycopg2 = { version="^2.9", optional=false }
 
 
 [build-system]
