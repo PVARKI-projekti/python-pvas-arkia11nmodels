@@ -33,6 +33,13 @@ exclude = '''
 )
 '''
 
+[tool.mypy]
+strict=true
+
+[[tool.mypy.overrides]]
+module="arkia11nmodels.models.*"  # Gino isn't properly typed yet
+disallow_subclassing_any=false
+
 [tool.pytest.ini_options]
 junit_family="xunit2"
 addopts="--cov=arkia11nmodels --cov-fail-under=65 --cov-branch"
@@ -45,7 +52,7 @@ max-line-length = 120
 max-parents = 10
 
 [tool.pylint.messages_control]
-disable=["fixme", "W1202", "C0330", "C0209"]
+disable=["fixme", "W1202", "C0209"]
 
 [tool.pylint.similarities]
 min-similarity-lines = 8
@@ -62,6 +69,7 @@ click = "^8.0"
 gino = {version = "^1.0", extras = ["starlette"]}
 alembic = { version="^1.9", optional=true }
 psycopg2 = { version="^2.9", optional=true }
+sqlalchemy-stubs = "^0.4"
 
 [tool.poetry.extras]
 migrations = ["alembic", "psycopg2"]
