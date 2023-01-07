@@ -70,6 +70,7 @@ gino = {version = "^1.0", extras = ["starlette"]}
 alembic = { version="^1.9", optional=true }
 psycopg2 = { version="^2.9", optional=true }
 sqlalchemy-stubs = "^0.4"
+pendulum = "^2.1"
 
 [tool.poetry.extras]
 migrations = ["alembic", "psycopg2"]

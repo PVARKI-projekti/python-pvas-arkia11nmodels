@@ -2,6 +2,7 @@
 import logging
 
 import pytest
+import pendulum
 from asyncpg.exceptions import UniqueViolationError
 
 from arkia11nmodels.models import User
@@ -30,16 +31,20 @@ async def test_user_crud(dockerdb: str) -> None:
     user = User(email="foo@example.com")
     await user.create()
     LOGGER.debug("user={}".format(user.to_dict()))
+    # make sure we can do aware comparisons
+    assert pendulum.now().diff(user.created).in_seconds() < 0.2  # type: ignore
     assert user.pk
     assert user.email == "foo@example.com"
     fetch_pk = str(user.pk)
     assert user.displayname == user.email
+    assert user.created == user.updated
     # Update
     await user.update(email="bar@example.com").apply()
     # Create
     fetched = await User.get(fetch_pk)
     LOGGER.debug("fetched={}".format(fetched.to_dict()))
     assert fetched.email == "bar@example.com"
+    assert fetched.created != fetched.updated
     # Delete
     await fetched.delete()
     fetchfail = await User.get(fetch_pk)
