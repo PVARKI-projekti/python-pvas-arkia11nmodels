@@ -57,6 +57,13 @@ def db_is_responsive(url: sqlalchemy.engine.url.URL) -> bool:
 
 
 @pytest.fixture(scope="session")
+def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
+    """return event loop, made session scoped fixture to allow db connections to persists between tests"""
+    loop = asyncio.get_event_loop()
+    yield loop
+
+
+@pytest.fixture(scope="session")
 def dockerdb(docker_ip: str, docker_services: Any, monkeysession: Any) -> Generator[str, None, None]:
     """start docker container for db"""
     LOGGER.debug("Monkeypatching env")

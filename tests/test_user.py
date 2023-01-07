@@ -43,3 +43,33 @@ async def test_user_crud(dockerdb: str) -> None:
     await fetched.delete()
     fetchfail = await User.get(fetch_pk)
     assert fetchfail is None
+
+
+@pytest.mark.asyncio
+async def test_user_profile(dockerdb: str) -> None:
+    """Test the JSON profile"""
+    _ = dockerdb  # consume the fixture to keep linter happy
+    # Create
+    user = User(email="zonk@example.com", profile={"key": "value", "nested": {"bool": True}})
+    await user.create()
+    LOGGER.debug("user={}".format(user.to_dict()))
+    assert user.pk
+    fetch_pk = str(user.pk)
+    assert user.email == "zonk@example.com"
+    # Mypy has false positives here with the magic getters
+    assert user.profile["key"] == "value"  # type: ignore
+    assert user.profile["nested"]["bool"] is True  # type: ignore
+
+    # update by making a copy, updating the copy and using the .update()
+    updated_profile = dict(user.profile)
+    updated_profile.update({"anotherkey": "different value", "numbers": [1, 3, 3, 7]})
+    await user.update(profile=updated_profile).apply()
+    assert user.profile["anotherkey"] == "different value"  # type: ignore
+
+    fetched = await User.get(fetch_pk)
+    LOGGER.debug("fetched={}".format(fetched.to_dict()))
+    # But there mypy is feeling fine ?
+    assert fetched.profile["anotherkey"] == "different value"
+    assert fetched.profile["numbers"][1] == 3
+
+    await fetched.delete()
