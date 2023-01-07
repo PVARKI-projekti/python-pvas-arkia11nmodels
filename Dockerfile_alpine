@@ -12,6 +12,9 @@ RUN export RESOLVED_VERSIONS=`pyenv_resolve $PYTHON_VERSIONS` \
     && poetry self update $POETRY_VERSION || pip install -U poetry==$POETRY_VERSION \
     && pip install -U tox \
     && apk add --no-cache \
+        libpq-dev \
+        docker-cli \
+        docker-compose \
         git \
     && true
 
@@ -117,7 +120,10 @@ ENTRYPOINT ["/sbin/tini", "--", "/docker-entrypoint.sh"]
 FROM builder_base as devel_build
 # Install deps
 WORKDIR /pysetup
-RUN --mount=type=ssh source /.venv/bin/activate \
+RUN --mount=type=ssh apk add --no-cache \
+        docker-cli \
+        docker-compose \
+    && source /.venv/bin/activate \
     && poetry install --no-interaction --no-ansi \
     && true
 

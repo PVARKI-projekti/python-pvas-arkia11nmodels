@@ -70,7 +70,7 @@ def dockerdb(docker_ip: str, docker_services: Any, monkeysession: Any) -> Genera
         "DATABASE": "modelstest",
     }
     for key, value in mp_values.items():
-        monkeysession.setenv(f"DB_{key}", value)
+        monkeysession.setenv(f"DB_{key}", str(value))
         monkeysession.setattr(dbconfig, key, value)
 
     new_dsn = sqlalchemy.engine.url.URL(

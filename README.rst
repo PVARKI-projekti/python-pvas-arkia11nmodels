@@ -36,7 +36,7 @@ Creating a development container
 Build image, create container and start it::
 
     docker build --ssh default --target devel_shell -t arkia11nmodels:devel_shell .
-    docker create --name arkia11nmodels_devel -v `pwd`":/app" -it `echo $DOCKER_SSHAGENT` arkia11nmodels:devel_shell
+    docker create --name arkia11nmodels_devel -v `pwd`":/app" -it `echo $DOCKER_SSHAGENT` --net host -v /var/run/docker.sock:/var/run/docker.sock arkia11nmodels:devel_shell
     docker start -i arkia11nmodels_devel
 
 pre-commit considerations
@@ -59,7 +59,7 @@ You can use the devel shell to run py.test when doing development, for CI use
 the "tox" target in the Dockerfile::
 
     docker build --ssh default --target tox -t arkia11nmodels:tox .
-    docker run --rm -it -v `pwd`":/app" `echo $DOCKER_SSHAGENT` arkia11nmodels:tox
+    docker run --rm -it -v `pwd`":/app" `echo $DOCKER_SSHAGENT`  --net host -v /var/run/docker.sock:/var/run/docker.sock arkia11nmodels:tox
 
 Production docker
 ^^^^^^^^^^^^^^^^^
