@@ -2,6 +2,7 @@
 import logging
 
 import pytest
+from asyncpg.exceptions import UniqueViolationError
 
 from arkia11nmodels.models import User
 
@@ -73,3 +74,17 @@ async def test_user_profile(dockerdb: str) -> None:
     assert fetched.profile["numbers"][1] == 3
 
     await fetched.delete()
+
+
+@pytest.mark.asyncio
+async def test_user_email_unique(dockerdb: str) -> None:
+    """Make sure email is unique"""
+    _ = dockerdb  # consume the fixture to keep linter happy
+    user1 = User(email="foo@example.com")
+    await user1.create()
+
+    with pytest.raises(UniqueViolationError):
+        user2 = User(email="foo@example.com")
+        await user2.create()
+
+    await user1.delete()
