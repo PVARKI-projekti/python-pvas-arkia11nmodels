@@ -44,19 +44,19 @@ trio = ["trio (>=0.16,<0.22)"]
 
 [[package]]
 name = "astroid"
-version = "2.12.14"
+version = "2.13.2"
 description = "An abstract syntax tree for Python with inference support."
 category = "dev"
 optional = false
 python-versions = ">=3.7.2"
 files = [
-    {file = "astroid-2.12.14-py3-none-any.whl", hash = "sha256:a1fbaad9d3e5f2eeb8e3a1d1d6008a081b1aac33ef86ff7742ae0714d92e9cf2"},
-    {file = "astroid-2.12.14.tar.gz", hash = "sha256:b573ed96112061150eade70851c277a92fba544812b781836ab16fedbbddb497"},
+    {file = "astroid-2.13.2-py3-none-any.whl", hash = "sha256:8f6a8d40c4ad161d6fc419545ae4b2f275ed86d1c989c97825772120842ee0d2"},
+    {file = "astroid-2.13.2.tar.gz", hash = "sha256:3bc7834720e1a24ca797fd785d77efb14f7a28ee8e635ef040b6e2d80ccb3303"},
 ]
 
 [package.dependencies]
 lazy-object-proxy = ">=1.4.0"
-typing-extensions = {version = ">=3.10", markers = "python_version < \"3.10\""}
+typing-extensions = ">=4.0.0"
 wrapt = [
     {version = ">=1.11,<2", markers = "python_version < \"3.11\""},
     {version = ">=1.14,<2", markers = "python_version >= \"3.11\""},
@@ -672,7 +672,6 @@ files = [
 
 [package.dependencies]
 asyncpg = ">=0.18,<1.0"
-gino-starlette = {version = ">=0.1.1,<0.2.0", optional = true, markers = "python_version >= \"3.6\" and python_version < \"4.0\" and extra == \"starlette\""}
 SQLAlchemy = ">=1.2.16,<1.4"
 
 [package.extras]
@@ -681,22 +680,6 @@ quart = ["gino-quart (>=0.1.0,<0.2.0)"]
 sanic = ["gino-sanic (>=0.1.0,<0.2.0)"]
 starlette = ["gino-starlette (>=0.1.1,<0.2.0)"]
 tornado = ["gino-tornado (>=0.1.0,<0.2.0)"]
-
-[[package]]
-name = "gino-starlette"
-version = "0.1.5"
-description = "An extension for GINO to integrate with Starlette"
-category = "main"
-optional = false
-python-versions = ">=3.6.2,<4.0.0"
-files = [
-    {file = "gino-starlette-0.1.5.tar.gz", hash = "sha256:2065986f918827814ffcadd2765a157ca97568ee40e479b8370de04ea8a95d12"},
-    {file = "gino_starlette-0.1.5-py3-none-any.whl", hash = "sha256:730e8a7befbf36f7347862444c9df545ad6726fe18008485f93f23cf5a4bfc36"},
-]
-
-[package.dependencies]
-gino = ">=1.0.1,<2.0.0"
-starlette = ">=0.19,<0.20"
 
 [[package]]
 name = "gitdb"
@@ -1668,14 +1651,14 @@ typing-extensions = ">=3.7.4"
 
 [[package]]
 name = "starlette"
-version = "0.19.1"
+version = "0.23.1"
 description = "The little ASGI library that shines."
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7"
 files = [
-    {file = "starlette-0.19.1-py3-none-any.whl", hash = "sha256:5a60c5c2d051f3a8eb546136aa0c9399773a689595e099e0877704d5888279bf"},
-    {file = "starlette-0.19.1.tar.gz", hash = "sha256:c6d21096774ecb9639acad41b86b7706e52ba3bf1dc13ea4ed9ad593d47e24c7"},
+    {file = "starlette-0.23.1-py3-none-any.whl", hash = "sha256:ec69736c90be8dbfc6ec6800ba6feb79c8c44f9b1706c0b2bb27f936bcf362cc"},
+    {file = "starlette-0.23.1.tar.gz", hash = "sha256:8510e5b3d670326326c5c1d4cb657cc66832193fe5d5b7015a51c7b1e1b1bf42"},
 ]
 
 [package.dependencies]
@@ -1683,7 +1666,7 @@ anyio = ">=3.4.0,<5"
 typing-extensions = {version = ">=3.10.0", markers = "python_version < \"3.10\""}
 
 [package.extras]
-full = ["itsdangerous", "jinja2", "python-multipart", "pyyaml", "requests"]
+full = ["httpx (>=0.22.0)", "itsdangerous", "jinja2", "python-multipart", "pyyaml"]
 
 [[package]]
 name = "stevedore"
@@ -1898,4 +1881,4 @@ migrations = ["alembic", "psycopg2"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "46a53f47cb9838bb056309e63a0d7cf43a8401670686136a2db595e085cb897f"
+content-hash = "7adddf12ce9818e010b4746172df54cb2ab1f902acdb1865fc212f401231d0fd"

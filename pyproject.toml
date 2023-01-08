@@ -66,11 +66,12 @@ branch = true
 python = "^3.8"
 libadvian = "^1.0"
 click = "^8.0"
-gino = {version = "^1.0", extras = ["starlette"]}
-alembic = { version="^1.9", optional=true }
-psycopg2 = { version="^2.9", optional=true }
+gino = "^1.0"
+starlette = ">=0.22,<1.0"  # caret behaviour on 0.x is to lock to 0.x.*
 sqlalchemy-stubs = "^0.4"
 pendulum = "^2.1"
+alembic = { version="^1.9", optional=true }
+psycopg2 = { version="^2.9", optional=true }
 
 [tool.poetry.extras]
 migrations = ["alembic", "psycopg2"]
