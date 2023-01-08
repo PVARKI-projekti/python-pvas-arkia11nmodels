@@ -20,6 +20,7 @@ class Role(BaseModel):
         role = await UserRole.query.where(UserRole.role == self.pk and UserRole.user == user.pk).gino.one_or_none()
         if role:
             return False
+        # FIXME: check if role has deleted property set, if so, unset instead of attempting to create
         role = UserRole(role=self.pk, user=user.pk)
         await role.create()
         return True
@@ -29,6 +30,7 @@ class Role(BaseModel):
         role = await UserRole.query.where(UserRole.role == self.pk and UserRole.user == user.pk).gino.one_or_none()
         if role is None:
             return False
+        # FIXME: mark as deleted by setting the deleted property instead
         await role.delete()
         return True
 
