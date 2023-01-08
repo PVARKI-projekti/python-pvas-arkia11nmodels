@@ -8,6 +8,8 @@ from libadvian.logging import init_logging
 import sqlalchemy
 
 
+from arkia11nmodels.dbdevhelpers import create_all
+
 init_logging(logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
 
@@ -34,9 +36,7 @@ def db_is_responsive(url: sqlalchemy.engine.url.URL) -> bool:
             from arkia11nmodels.models import db  # pylint: disable=C0415
 
             await db.set_bind(url)
-            # We have to create the schema ourself, Gino does not figure it automagically
-            await db.status(sqlalchemy.schema.CreateSchema("a11n"))
-            await db.gino.create_all()
+            await create_all()
 
         asyncio.get_event_loop().run_until_complete(create_tables())
 

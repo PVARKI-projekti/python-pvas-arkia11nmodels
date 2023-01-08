@@ -5,9 +5,9 @@ import asyncio
 
 import click
 from libadvian.logging import init_logging
-import sqlalchemy
 
 from arkia11nmodels import __version__, dbconfig, models
+from arkia11nmodels.dbdevhelpers import create_all, drop_all
 
 
 LOGGER = logging.getLogger(__name__)
@@ -35,9 +35,7 @@ def create_tables() -> None:
 
     async def runner() -> None:
         await models.db.set_bind(dbconfig.DSN)
-        # FIXME figure out the schemas dynamically
-        await models.db.status(sqlalchemy.schema.CreateSchema("a11n"))
-        await models.db.gino.create_all()
+        await create_all()
 
     asyncio.get_event_loop().run_until_complete(runner())
 
@@ -48,9 +46,7 @@ def drop_tables() -> None:
 
     async def runner() -> None:
         await models.db.set_bind(dbconfig.DSN)
-        await models.db.gino.drop_all()
-        # FIXME figure out the schemas dynamically
-        await models.db.status(sqlalchemy.schema.DropSchema("a11n"))
+        await drop_all()
 
     asyncio.get_event_loop().run_until_complete(runner())
 
