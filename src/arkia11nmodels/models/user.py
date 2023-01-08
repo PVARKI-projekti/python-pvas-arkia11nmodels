@@ -4,8 +4,8 @@ import sqlalchemy as sa
 
 from .base import BaseModel
 
-# pylint: disable=R0903
-class User(BaseModel):
+
+class User(BaseModel):  # pylint: disable=R0903
     """Users"""
 
     __tablename__ = "users"
