@@ -24,6 +24,7 @@ class Token(BaseModel):
     token = sa.Column(saUUID(), index=True, default=uuid.uuid4, nullable=False)
     user = sa.Column(saUUID(), sa.ForeignKey(User.pk))
     sent_to = sa.Column(sa.String(), nullable=False)
+    redirect = sa.Column(sa.String(), nullable=True)
     expires = sa.Column(sa.DateTime(timezone=True), nullable=False)
     used = sa.Column(sa.DateTime(timezone=True), nullable=True)
     audit_meta = sa.Column(JSONB, nullable=False, server_default="{}")
