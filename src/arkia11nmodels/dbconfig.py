@@ -32,7 +32,7 @@ DSN = config(
 POOL_MIN_SIZE = config("DB_POOL_MIN_SIZE", cast=int, default=1)
 POOL_MAX_SIZE = config("DB_POOL_MAX_SIZE", cast=int, default=16)
 ECHO = config("DB_ECHO", cast=bool, default=False)
-SSL = config("DB_SSL", cast=bool, default=None)
+SSL = config("DB_SSL", cast=str, default="prefer")  # see asyncpg.connect()
 USE_CONNECTION_FOR_REQUEST = config("DB_USE_CONNECTION_FOR_REQUEST", cast=bool, default=True)
 RETRY_LIMIT = config("DB_RETRY_LIMIT", cast=int, default=1)
 RETRY_INTERVAL = config("DB_RETRY_INTERVAL", cast=int, default=1)
