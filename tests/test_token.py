@@ -2,12 +2,17 @@
 from typing import AsyncGenerator
 import logging
 import asyncio
+import json
 
 import pytest
 import pytest_asyncio
 import pendulum
+from pydantic import ValidationError
+from libadvian.binpackers import b64_to_uuid, uuid_to_b64
 
 from arkia11nmodels.models import Token, User
+from arkia11nmodels.schemas.token import TokenRequest, DBToken
+from arkia11nmodels.clickhelpers import get_by_uuid
 
 LOGGER = logging.getLogger(__name__)
 
@@ -21,15 +26,61 @@ async def with_user(dockerdb: str) -> AsyncGenerator[User, None]:
     _ = dockerdb  # consume the fixture to keep linter happy
     user = User(email="tokentest@example.com")
     await user.create()
-    yield user
-    await Token.delete.where(Token.user == user.pk).gino.status()  # Nuke leftovers
-    await user.delete()
+    # refresh from db
+    dbuser = await User.get(user.pk)
+    yield dbuser
+    await Token.delete.where(Token.user == dbuser.pk).gino.status()  # Nuke leftovers
+    await dbuser.delete()
 
 
 @pytest.mark.asyncio
 async def test_user_fixture(with_user: User) -> None:
     """Just test the fixture"""
     assert with_user.email == "tokentest@example.com"
+
+
+@pytest.mark.asyncio
+async def test_token_pydantic_validators() -> None:
+    """Test the pydantic schemas"""
+    req = TokenRequest(target="tokentest@example.com")
+    exported = req.dict()
+    LOGGER.debug("exported={}".format(repr(exported)))
+    assert req.deliver_via == "email"
+    with pytest.raises(ValidationError):
+        invalidreq = TokenRequest(target="tokentest@example.com", deliver_via="nosuchvalue")
+        assert not invalidreq
+
+
+@pytest.mark.asyncio
+async def test_token_pydantic_db(with_user: User) -> None:
+    """Test the pydantic schemas"""
+    token = Token.for_user(with_user)
+    token.sent_to = with_user.email
+    await token.create()
+    try:
+        # Test pydantic instantiation from db, JSON serialisation
+        pdtoken = DBToken(**token.to_dict())
+        pdtoken_ser = pdtoken.json()
+        deser = json.loads(pdtoken_ser)
+        assert b64_to_uuid(deser["pk"]) == token.pk
+        assert b64_to_uuid(deser["user"]) == with_user.pk
+        assert deser["expires"] == token.expires.isoformat()
+        assert not deser["used"]
+        # Mark used
+        await token.mark_used()
+        # refresh
+        token = await Token.get(token.pk)
+        # Check again
+        pdtoken = DBToken(**token.to_dict())
+        pdtoken_ser = pdtoken.json()
+        deser = json.loads(pdtoken_ser)
+        assert token.used
+        assert deser["used"] == token.used.isoformat()
+        assert b64_to_uuid(deser["pk"]) == token.pk
+        assert b64_to_uuid(deser["user"]) == with_user.pk
+    finally:
+        # clean up
+        await token.delete()
 
 
 @pytest.mark.asyncio
@@ -49,6 +100,10 @@ async def test_token_crud(with_user: User) -> None:
     fetched = await Token.get(token_pk)
     assert not fetched.is_valid()
     assert fetched.updated != fetched.created
+
+    # Test click-helper
+    await get_by_uuid(Token, uuid_to_b64(fetched.pk))
+    await get_by_uuid(Token, str(token.pk))
 
     # Delete
     await token.delete()

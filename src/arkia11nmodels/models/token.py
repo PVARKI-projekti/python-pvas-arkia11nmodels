@@ -1,7 +1,6 @@
 """The one-time tokens"""
 from __future__ import annotations
 from typing import Optional, Dict, Any, Union
-import uuid
 import datetime
 
 from sqlalchemy.dialects.postgresql import UUID as saUUID, JSONB
@@ -21,7 +20,6 @@ class Token(BaseModel):
 
     __tablename__ = "tokens"
 
-    token = sa.Column(saUUID(), index=True, default=uuid.uuid4, nullable=False)
     user = sa.Column(saUUID(), sa.ForeignKey(User.pk))
     sent_to = sa.Column(sa.String(), nullable=False)
     redirect = sa.Column(sa.String(), nullable=True)
