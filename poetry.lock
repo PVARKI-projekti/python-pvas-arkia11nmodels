@@ -1986,4 +1986,4 @@ migrations = ["alembic", "psycopg2"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "6bcc99df6b1c5d145dcccb8d5f0d6706e0372bc2521db72cea35beaff11be26a"
+content-hash = "612dff794ce41bd916b8d50ae530a79c9604660dabfb9954aaff94fb7cf8fb68"
