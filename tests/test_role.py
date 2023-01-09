@@ -140,8 +140,11 @@ async def test_role_crud() -> None:
     assert fetched.acl[0]["target"] == "fi.pvarki.dummyservicle:read"
 
     # Test click-helper
-    await get_by_uuid(Role, uuid_to_b64(fetched.pk))
-    await get_by_uuid(Role, str(role.pk))
+    assert await get_by_uuid(Role, uuid_to_b64(fetched.pk))
+    assert await get_by_uuid(Role, str(role.pk))
+    # Check that non-existent uuids raise error
+    with pytest.raises(ValueError):
+        assert not await get_by_uuid(Role, "917813ec-9243-45df-a46e-0a8dacc5c0e0")
 
     # Delete
     await role.delete()

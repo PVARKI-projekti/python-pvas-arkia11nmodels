@@ -102,8 +102,8 @@ async def test_token_crud(with_user: User) -> None:
     assert fetched.updated != fetched.created
 
     # Test click-helper
-    await get_by_uuid(Token, uuid_to_b64(fetched.pk))
-    await get_by_uuid(Token, str(token.pk))
+    assert await get_by_uuid(Token, uuid_to_b64(fetched.pk))
+    assert await get_by_uuid(Token, str(token.pk))
 
     # Delete
     await token.delete()

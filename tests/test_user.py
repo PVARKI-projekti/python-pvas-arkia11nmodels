@@ -90,8 +90,8 @@ async def test_user_crud(dockerdb: str) -> None:
     assert fetched.created != fetched.updated
 
     # Test click-helper
-    await get_by_uuid(User, uuid_to_b64(fetched.pk))
-    await get_by_uuid(User, str(user.pk))
+    assert await get_by_uuid(User, uuid_to_b64(fetched.pk))
+    assert await get_by_uuid(User, str(user.pk))
 
     # Delete
     await fetched.delete()

@@ -49,6 +49,8 @@ async def get_by_uuid(klass: Type[BaseModel], pkin: Union[bytes, str]) -> BaseMo
     except ValueError:
         getpk = uuid.UUID(ensure_str(pkin))
     obj = await klass.get(getpk)
+    if not obj:
+        raise ValueError(f"{klass} with {ensure_str(pkin)} not found")
     return cast(BaseModel, obj)
 
 
