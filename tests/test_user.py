@@ -5,10 +5,11 @@ import logging
 import pytest
 import pendulum
 from asyncpg.exceptions import UniqueViolationError
-from libadvian.binpackers import b64_to_uuid
+from libadvian.binpackers import b64_to_uuid, uuid_to_b64
 
 from arkia11nmodels.models import User
 from arkia11nmodels.schemas.user import UserCreate, DBUser
+from arkia11nmodels.clickhelpers import get_by_uuid
 
 LOGGER = logging.getLogger(__name__)
 
@@ -82,6 +83,11 @@ async def test_user_crud(dockerdb: str) -> None:
     LOGGER.debug("fetched={}".format(fetched.to_dict()))
     assert fetched.email == "bar@example.com"
     assert fetched.created != fetched.updated
+
+    # Test click-helper
+    await get_by_uuid(User, uuid_to_b64(fetched.pk))
+    await get_by_uuid(User, str(user.pk))
+
     # Delete
     await fetched.delete()
     fetchfail = await User.get(fetch_pk)
