@@ -31,6 +31,8 @@ def test_can_instantiate_user() -> None:
 @pytest.mark.asyncio
 async def test_user_pydantic_validators() -> None:
     """Test the pydantic schemas"""
+    assert UserCreate.schema()
+    assert DBUser.schema()
     pdcuser = UserCreate(email="foo@example.com")
     exported = pdcuser.dict()
     LOGGER.debug("exported={}".format(repr(exported)))

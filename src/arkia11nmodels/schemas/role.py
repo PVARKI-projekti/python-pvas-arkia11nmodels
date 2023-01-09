@@ -33,7 +33,7 @@ class RoleCreate(CreateBase):
     """Create Role objects"""
 
     displayname: str = Field(description="Name of the role")
-    acl: Sequence[ACLItem] = Field(default=list, description="List of ACL definitions, see ACLItem")
+    acl: Sequence[ACLItem] = Field(default_factory=list, description="List of ACL definitions, see ACLItem")
     priority: int = Field(default=DEFAULT_PRIORITY, description="Merge priority, lower is more important")
 
 

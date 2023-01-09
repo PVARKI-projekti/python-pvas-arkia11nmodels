@@ -42,6 +42,8 @@ async def test_user_fixture(with_user: User) -> None:
 @pytest.mark.asyncio
 async def test_token_pydantic_validators() -> None:
     """Test the pydantic schemas"""
+    assert TokenRequest.schema()
+    assert DBToken.schema()
     req = TokenRequest(target="tokentest@example.com")
     exported = req.dict()
     LOGGER.debug("exported={}".format(repr(exported)))

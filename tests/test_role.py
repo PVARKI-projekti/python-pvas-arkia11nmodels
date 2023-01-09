@@ -40,6 +40,9 @@ async def test_role_fixture(with_role: Role) -> None:
 @pytest.mark.asyncio
 async def test_role_pydantic_validators() -> None:
     """Test the pydantic schemas"""
+    assert ACLItem.schema()
+    assert ACL.schema()
+    assert DBRole.schema()
     validaclitem = ACLItem.parse_obj(
         {
             "privilege": "fi.arki.superadmin",
@@ -79,6 +82,9 @@ async def test_role_pydantic_validators() -> None:
     exported = pdcrole.dict()
     LOGGER.debug("exported={}".format(repr(exported)))
     assert pdcrole.displayname == exported["displayname"]
+    ser = pdcrole.json()
+    deser = json.loads(ser)
+    assert deser["acl"][0]["privilege"] == "fi.arki.superadmin"
 
     with pytest.raises(ValidationError):
         invalidrole = RoleCreate(
