@@ -7,16 +7,19 @@ from pydantic.networks import EmailStr  # pylint: disable=E0611 # false positive
 
 from .base import CreateBase, DBBase
 
+# pylint: disable=R0903
 LOGGER = logging.getLogger(__name__)
 
-# pylint: disable=R0903
+
 class UserCreate(CreateBase):
     """Create User objects"""
 
-    email: EmailStr
-    sms: Optional[str] = Field(default=None, nullable=True)
-    displayname: Optional[str]
-    profile: Optional[Dict[str, Any]] = Field(default={})
+    email: EmailStr = Field(description="User email address")
+    sms: Optional[str] = Field(
+        default=None, nullable=True, description="SMS (or similar messaging platform number) for user"
+    )
+    displayname: Optional[str] = Field(description="User display name, defaults to the email if not given")
+    profile: Optional[Dict[str, Any]] = Field(default={}, description="Arbitrary dictionary of 'profile' type info")
 
     @validator("displayname", always=True)
     @classmethod

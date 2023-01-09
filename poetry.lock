@@ -1312,6 +1312,21 @@ dotenv = ["python-dotenv (>=0.10.4)"]
 email = ["email-validator (>=1.0.3)"]
 
 [[package]]
+name = "pydantic-collections"
+version = "0.4.0"
+description = "Collections of pydantic models"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "pydantic-collections-0.4.0.tar.gz", hash = "sha256:4e8f7ef091e5bcc73e5008b3c1fa97222f5bf4219081bc346001b62a92ecd70b"},
+    {file = "pydantic_collections-0.4.0-py3-none-any.whl", hash = "sha256:cd72e6571bc794e7f1e2f14c1f71447d42cf30c59bf64a2c3c9637c098cc8440"},
+]
+
+[package.dependencies]
+pydantic = ">=1.8.2"
+
+[[package]]
 name = "pylint"
 version = "2.15.10"
 description = "python code static checker"
@@ -1971,4 +1986,4 @@ migrations = ["alembic", "psycopg2"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "3e1343b012fd7a2c87119d13828a7b3f785102ca459bf366d64100de931b6b2f"
+content-hash = "6bcc99df6b1c5d145dcccb8d5f0d6706e0372bc2521db72cea35beaff11be26a"

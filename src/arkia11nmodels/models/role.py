@@ -5,6 +5,8 @@ import sqlalchemy as sa
 from .base import BaseModel
 from .user import User
 
+DEFAULT_PRIORITY = 1000
+
 
 class Role(BaseModel):
     """Role, ACLs (format TBDefined) stored as list of dicts in the JSON property"""
@@ -13,7 +15,9 @@ class Role(BaseModel):
 
     displayname = sa.Column(sa.Unicode(), nullable=False)
     acl = sa.Column(JSONB, nullable=False, server_default="[]")
-    priority = sa.Column(sa.Integer, nullable=False, default=1000)  # merge priority, lower is more important
+    priority = sa.Column(
+        sa.Integer, nullable=False, default=DEFAULT_PRIORITY
+    )  # merge priority, lower is more important
 
     async def assign_to(self, user: User) -> bool:
         """Assign this role to user, returns True if created, False if nothing was done (already assigned)"""

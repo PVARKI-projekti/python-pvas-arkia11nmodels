@@ -6,6 +6,7 @@ import pytest
 import pendulum
 from asyncpg.exceptions import UniqueViolationError
 from libadvian.binpackers import b64_to_uuid, uuid_to_b64
+from pydantic import ValidationError
 
 from arkia11nmodels.models import User
 from arkia11nmodels.schemas.user import UserCreate, DBUser
@@ -36,6 +37,10 @@ async def test_user_pydantic_validators() -> None:
     assert pdcuser.email == pdcuser.displayname
     assert pdcuser.email == exported["email"]
     assert pdcuser.displayname == exported["displayname"]
+
+    with pytest.raises(ValidationError):
+        invaliduser = UserCreate(email="foo@example.com", nosuchfield="should not be")
+        assert not invaliduser
 
 
 @pytest.mark.asyncio

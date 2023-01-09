@@ -40,6 +40,11 @@ strict=true
 module="arkia11nmodels.models.*"  # Gino isn't properly typed yet
 disallow_subclassing_any=false
 
+[[tool.mypy.overrides]]
+module="arkia11nmodels.schemas.role"  # pydantic_collections has issues
+disallow_subclassing_any=false
+
+
 [tool.pytest.ini_options]
 junit_family="xunit2"
 addopts="--cov=arkia11nmodels --cov-fail-under=65 --cov-branch"
@@ -71,6 +76,7 @@ starlette = ">=0.22,<1.0"  # caret behaviour on 0.x is to lock to 0.x.*
 sqlalchemy-stubs = "^0.4"
 pendulum = "^2.1"
 pydantic = { version="^1.10", extras=["email"] }
+pydantic-collections = ">=0.4,<1.0"  # caret behaviour on 0.x is to lock to 0.x.*
 alembic = { version="^1.9", optional=true }
 psycopg2 = { version="^2.9", optional=true }
 
