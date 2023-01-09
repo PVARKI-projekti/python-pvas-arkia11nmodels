@@ -1,11 +1,14 @@
 """Test the user model"""
+import json
 import logging
 
 import pytest
 import pendulum
 from asyncpg.exceptions import UniqueViolationError
+from libadvian.binpackers import b64_to_uuid
 
 from arkia11nmodels.models import User
+from arkia11nmodels.schemas.user import UserCreate, DBUser
 
 LOGGER = logging.getLogger(__name__)
 
@@ -21,6 +24,40 @@ def test_can_instantiate_user() -> None:
     # These default values only get set on insert/update since we're not using dataclasses
     # assert user.displayname == user.email
     # assert user.pk
+
+
+@pytest.mark.asyncio
+async def test_user_pydantic_validators() -> None:
+    """Test the pydantic schemas"""
+    pdcuser = UserCreate(email="foo@example.com")
+    exported = pdcuser.dict()
+    LOGGER.debug("exported={}".format(repr(exported)))
+    assert pdcuser.email == pdcuser.displayname
+    assert pdcuser.email == exported["email"]
+    assert pdcuser.displayname == exported["displayname"]
+
+
+@pytest.mark.asyncio
+async def test_user_pydantic_db(dockerdb: str) -> None:
+    """Test the pydantic schemas"""
+    _ = dockerdb  # consume the fixture to keep linter happy
+    # Test user creation via pydantic model
+    pdcuser = UserCreate(email="foo@example.com")
+    LOGGER.debug("pdcuser.dict()={}".format(pdcuser.dict()))
+    user = User(**pdcuser.dict())
+    await user.create()
+    try:
+        # Test pydantic instantiation from db, JSON serialisation
+        pduser = DBUser(**user.to_dict())
+        pduser_ser = pduser.json()
+        deser = json.loads(pduser_ser)
+        assert b64_to_uuid(deser["pk"]) == user.pk
+        assert deser["displayname"] == pdcuser.displayname
+        assert pdcuser.displayname == user.displayname
+        assert pdcuser.displayname == user.email
+    finally:
+        # clean up
+        await user.delete()
 
 
 @pytest.mark.asyncio

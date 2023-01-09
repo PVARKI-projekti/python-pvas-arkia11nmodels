@@ -70,6 +70,7 @@ gino = "^1.0"
 starlette = ">=0.22,<1.0"  # caret behaviour on 0.x is to lock to 0.x.*
 sqlalchemy-stubs = "^0.4"
 pendulum = "^2.1"
+pydantic = { version="^1.10", extras=["email"] }
 alembic = { version="^1.9", optional=true }
 psycopg2 = { version="^2.9", optional=true }
 
