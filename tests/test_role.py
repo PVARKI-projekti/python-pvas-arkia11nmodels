@@ -161,8 +161,16 @@ async def test_role_crud() -> None:
 @pytest.mark.asyncio
 async def test_role_assign_remove(with_user: User, with_role: Role) -> None:
     """Check that the helpers work"""
+    user2 = User(email="assign2@example.com")
+    await user2.create()
+    user2 = await User.get(user2.pk)
+
     assert await with_role.assign_to(with_user)
+    assert await with_role.assign_to(user2)
     assert not await with_role.assign_to(with_user)
+    assert await with_role.remove_from(with_user)
+    assert await with_role.remove_from(user2)
+    assert await with_role.assign_to(with_user)
     assert await with_role.remove_from(with_user)
     assert not await with_role.remove_from(with_user)
 
@@ -178,3 +186,59 @@ async def test_userrole_unique(with_user: User, with_role: Role) -> None:
         await link2.create()
 
     await link1.delete()
+
+
+@pytest.mark.asyncio
+async def test_user_roles(dockerdb: str) -> None:
+    """Test user roles resolving"""
+    _ = dockerdb  # consume the fixture to keep linter happy
+    # Create all new users and roles for this mess
+    user1 = User(email="persona@example.com")
+    await user1.create()
+    user1 = await User.get(user1.pk)
+    user2 = User(email="nongratta@example.com")
+    await user2.create()
+    user2 = await User.get(user2.pk)
+
+    role_1000 = Role(displayname="Priority 1000", priority=1000)
+    await role_1000.create()
+    role_1000 = await Role.get(role_1000.pk)
+    role_1 = Role(displayname="Priority 1", priority=1)
+    await role_1.create()
+    role_1 = await Role.get(role_1.pk)
+    role_100 = Role(displayname="Priority 1", priority=100)
+    await role_100.create()
+    role_100 = await Role.get(role_100.pk)
+
+    assert await role_100.assign_to(user1)
+    assert await role_1.assign_to(user1)
+    assert await role_1000.assign_to(user1)
+    lnks1 = await UserRole.query.where(UserRole.user == user1.pk).gino.all()
+    LOGGER.debug("lnks1={}".format(lnks1))
+    assert lnks1
+
+    user1_roles = await Role.resolve_user_roles(user1)
+    user1_role_dicts = [role.to_dict() for role in user1_roles]
+    LOGGER.debug("user1_role_dicts={}".format(user1_role_dicts))
+    assert user1_roles[2].priority == 1
+    assert user1_roles[1].priority == 100
+    assert user1_roles[0].priority == 1000
+
+    assert await role_1.assign_to(user2)
+    assert await role_1000.assign_to(user2)
+    lnks2 = await UserRole.query.where(UserRole.user == user2.pk).gino.all()
+    LOGGER.debug("lnks2={}".format(lnks2))
+    assert lnks2
+
+    user2_roles = await Role.resolve_user_roles(user2)
+    user2_role_dicts = [role.to_dict() for role in user2_roles]
+    LOGGER.debug("user2_role_dicts={}".format(user2_role_dicts))
+    assert user2_roles[0].priority == 1000
+    assert user2_roles[1].priority == 1
+
+    await UserRole.delete.where(UserRole.role == role_1000.pk).gino.status()
+    await role_1000.delete()
+    await UserRole.delete.where(UserRole.role == role_100.pk).gino.status()
+    await role_100.delete()
+    await UserRole.delete.where(UserRole.role == role_1.pk).gino.status()
+    await role_1.delete()

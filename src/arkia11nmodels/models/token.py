@@ -1,5 +1,4 @@
 """The one-time tokens"""
-from __future__ import annotations
 from typing import Optional, Dict, Any, Union
 import datetime
 
@@ -39,7 +38,7 @@ class Token(BaseModel):
         await self.update(used=pendulum.now("UTC"), audit_meta=audit_copy).apply()
 
     @classmethod
-    def for_user(cls, user: User, expires: Optional[TimeOrDuration] = None) -> Token:
+    def for_user(cls, user: User, expires: Optional[TimeOrDuration] = None) -> "Token":
         """Return one from user instance, just a shorthand"""
         if expires is None:
             expires = pendulum.now("UTC") + DEFAULT_EXPIRES
