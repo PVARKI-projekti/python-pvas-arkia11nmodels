@@ -1,9 +1,12 @@
 """Pydantic schema for models.User"""
 from typing import Optional, Any, Dict
 import logging
+import uuid
 
 from pydantic import Field, validator
 from pydantic.networks import EmailStr  # pylint: disable=E0611 # false positive
+from pydantic_collections import BaseCollectionModel
+from libadvian.binpackers import ensure_str, uuid_to_b64
 
 from .base import CreateBase, DBBase
 
@@ -33,3 +36,13 @@ class UserCreate(CreateBase):
 
 class DBUser(UserCreate, DBBase):
     """Display/update user objects"""
+
+
+class UserList(BaseCollectionModel[DBUser]):
+    """List of Users"""
+
+    class Config:
+        """Pydantic configs"""
+
+        extra = "forbid"
+        json_encoders = {uuid.UUID: lambda val: ensure_str(uuid_to_b64(val))}

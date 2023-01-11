@@ -41,7 +41,7 @@ module="arkia11nmodels.models.*"  # Gino isn't properly typed yet
 disallow_subclassing_any=false
 
 [[tool.mypy.overrides]]
-module="arkia11nmodels.schemas.role"  # pydantic_collections has issues
+module="arkia11nmodels.schemas.*"  # pydantic_collections has issues
 disallow_subclassing_any=false
 
 

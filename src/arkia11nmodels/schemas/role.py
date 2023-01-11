@@ -1,16 +1,19 @@
 """Pydantic schemas for models.Role"""
 from typing import Optional, Sequence
 import logging
+import uuid
 
 from pydantic import Field
 from pydantic.main import BaseModel  # pylint: disable=E0611 # false positive
 from pydantic_collections import BaseCollectionModel
+from libadvian.binpackers import ensure_str, uuid_to_b64
 
 from .base import CreateBase, DBBase
-from ..models.role import DEFAULT_PRIORITY
+
 
 # pylint: disable=R0903
 LOGGER = logging.getLogger(__name__)
+DEFAULT_PRIORITY = 1000
 
 
 class ACLItem(BaseModel, extra="forbid"):
@@ -39,3 +42,13 @@ class RoleCreate(CreateBase):
 
 class DBRole(RoleCreate, DBBase):
     """Display/update Role objects"""
+
+
+class RoleList(BaseCollectionModel[DBRole]):
+    """List of Roles"""
+
+    class Config:
+        """Pydantic configs"""
+
+        extra = "forbid"
+        json_encoders = {uuid.UUID: lambda val: ensure_str(uuid_to_b64(val))}

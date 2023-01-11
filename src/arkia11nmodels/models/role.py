@@ -7,9 +7,9 @@ import pendulum
 
 from .base import BaseModel
 from .user import User
+from ..schemas.role import DEFAULT_PRIORITY, ACL, RoleList
 
 LOGGER = logging.getLogger(__name__)
-DEFAULT_PRIORITY = 1000
 
 
 class Role(BaseModel):
@@ -46,6 +46,16 @@ class Role(BaseModel):
             return False
         await user_role.update(deleted=pendulum.now("UTC")).apply()
         return True
+
+    @classmethod
+    async def resolve_user_roles(cls, user: User) -> RoleList:
+        """Resolve roles user has"""
+        raise NotImplementedError()
+
+    @classmethod
+    async def resolve_user_acl(cls, user: User) -> ACL:
+        """Merge ACL from users' roles"""
+        raise NotImplementedError()
 
 
 class UserRole(BaseModel):  # pylint: disable=R0903
