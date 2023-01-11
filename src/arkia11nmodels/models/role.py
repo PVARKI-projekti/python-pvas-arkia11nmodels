@@ -1,5 +1,5 @@
 """Roles"""
-from typing import List
+from typing import AsyncGenerator, List
 import logging
 
 from sqlalchemy.dialects.postgresql import UUID as saUUID, JSONB
@@ -70,16 +70,38 @@ class Role(BaseModel):
         await user_role.update(deleted=pendulum.now("UTC")).apply()
         return True
 
-    @classmethod
-    async def resolve_user_roles(cls, user: User) -> List["Role"]:
-        """Resolve roles user has (sorted in descending priority so they're easier to merge)"""
+    async def iter_role_users(self) -> AsyncGenerator[User, None]:
+        """Return iterator for users with this role"""
+        async with db.acquire() as conn:  # Cursors need transaction
+            async with conn.transaction():
+                async for lnk in UserRole.load(user=User).query.where(UserRole.role == self.pk).where(
+                    UserRole.deleted == None  # pylint: disable=C0121 ; # "is None" will create invalid query
+                ).order_by(User.displayname).gino.iterate():
+                    yield lnk.user
+
+    async def list_role_users(self) -> List[User]:
+        """Consumes the iterator from iter_role_users and returns a list. NOTE: This might get *very* expensive"""
         ret = []
+        async for user in self.iter_role_users():
+            ret.append(user)
+        return ret
+
+    @classmethod
+    async def iter_user_roles(cls, user: User) -> AsyncGenerator["Role", None]:
+        """Resolve roles user has (sorted in descending priority so they're easier to merge) and yields one by one"""
         async with db.acquire() as conn:  # Cursors need transaction
             async with conn.transaction():
                 async for lnk in UserRole.load(role=Role).query.where(UserRole.user == user.pk).where(
                     UserRole.deleted == None  # pylint: disable=C0121 ; # "is None" will create invalid query
                 ).order_by(Role.priority.desc()).gino.iterate():
-                    ret.append(lnk.role)
+                    yield lnk.role
+
+    @classmethod
+    async def list_user_roles(cls, user: User) -> List["Role"]:
+        """Consumes the iterator from iter_user_roles and returns a list"""
+        ret = []
+        async for role in cls.iter_user_roles(user):
+            ret.append(role)
         return ret
 
     @classmethod

@@ -1,5 +1,5 @@
 """Test roles and linking"""
-from typing import AsyncGenerator
+from typing import AsyncGenerator, List, Tuple
 import logging
 import json
 
@@ -188,9 +188,12 @@ async def test_userrole_unique(with_user: User, with_role: Role) -> None:
     await link1.delete()
 
 
-@pytest.mark.asyncio
-async def test_user_roles(dockerdb: str) -> None:
-    """Test user roles resolving"""
+RoleTestDbType = Tuple[User, User, Role, Role, Role]
+
+
+@pytest_asyncio.fixture
+async def role_test_db(dockerdb: str) -> AsyncGenerator[RoleTestDbType, None]:
+    """Setup DB for user role helpers"""
     _ = dockerdb  # consume the fixture to keep linter happy
     # Create all new users and roles for this mess
     user1 = User(email="persona@example.com")
@@ -217,28 +220,55 @@ async def test_user_roles(dockerdb: str) -> None:
     LOGGER.debug("lnks1={}".format(lnks1))
     assert lnks1
 
-    user1_roles = await Role.resolve_user_roles(user1)
-    user1_role_dicts = [role.to_dict() for role in user1_roles]
-    LOGGER.debug("user1_role_dicts={}".format(user1_role_dicts))
-    assert user1_roles[2].priority == 1
-    assert user1_roles[1].priority == 100
-    assert user1_roles[0].priority == 1000
-
     assert await role_1.assign_to(user2)
     assert await role_1000.assign_to(user2)
     lnks2 = await UserRole.query.where(UserRole.user == user2.pk).gino.all()
     LOGGER.debug("lnks2={}".format(lnks2))
     assert lnks2
 
-    user2_roles = await Role.resolve_user_roles(user2)
-    user2_role_dicts = [role.to_dict() for role in user2_roles]
-    LOGGER.debug("user2_role_dicts={}".format(user2_role_dicts))
-    assert user2_roles[0].priority == 1000
-    assert user2_roles[1].priority == 1
+    yield user1, user2, role_1, role_100, role_1000
 
+    # clean up
     await UserRole.delete.where(UserRole.role == role_1000.pk).gino.status()
     await role_1000.delete()
     await UserRole.delete.where(UserRole.role == role_100.pk).gino.status()
     await role_100.delete()
     await UserRole.delete.where(UserRole.role == role_1.pk).gino.status()
     await role_1.delete()
+
+
+@pytest.mark.asyncio
+async def test_user_roles(role_test_db: RoleTestDbType) -> None:
+    """Test user roles resolving"""
+
+    user1, user2, role_1, role_100, role_1000 = role_test_db
+
+    user1_roles = await Role.list_user_roles(user1)
+    user1_role_dicts = [role.to_dict() for role in user1_roles]
+    LOGGER.debug("user1_role_dicts={}".format(user1_role_dicts))
+    assert user1_roles[2].priority == 1
+    assert user1_roles[1].priority == 100
+    assert user1_roles[0].priority == 1000
+
+    user2_roles = await Role.list_user_roles(user2)
+    user2_role_dicts = [role.to_dict() for role in user2_roles]
+    LOGGER.debug("user2_role_dicts={}".format(user2_role_dicts))
+    assert user2_roles[0].priority == 1000
+    assert user2_roles[1].priority == 1
+
+    def user_in_lst(user: User, lst: List[User]) -> bool:
+        for lstuser in lst:
+            if lstuser.pk == user.pk:
+                return True
+        return False
+
+    # Test listing of users by role
+    users_1 = await role_1.list_role_users()
+    assert user_in_lst(user2, users_1)
+    assert user_in_lst(user1, users_1)
+    users_1000 = await role_1000.list_role_users()
+    assert user_in_lst(user2, users_1000)
+    assert user_in_lst(user1, users_1000)
+    users_100 = await role_100.list_role_users()
+    assert not user_in_lst(user2, users_100)
+    assert user_in_lst(user1, users_100)
