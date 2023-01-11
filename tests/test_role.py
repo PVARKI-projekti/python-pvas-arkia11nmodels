@@ -20,7 +20,7 @@ LOGGER = logging.getLogger(__name__)
 # pylint: disable=W0621
 
 
-@pytest_asyncio.fixture(scope="module")
+@pytest_asyncio.fixture(scope="function")
 async def with_role(dockerdb: str) -> AsyncGenerator[User, None]:
     """Create a role for tests"""
     _ = dockerdb  # consume the fixture to keep linter happy
