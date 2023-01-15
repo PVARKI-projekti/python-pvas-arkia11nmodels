@@ -19,11 +19,11 @@ class User(BaseModel):  # pylint: disable=R0903
 
     default_acl: ClassVar[ACL] = ACL(
         [
-            ACLItem(privilege="fi.arki.arkia11nmodels.user:read", target="self", action=True),
-            ACLItem(privilege="fi.arki.arkia11nmodels.token:read", target="self", action=True),
+            ACLItem(privilege="fi.pvarki.arkia11nmodels.user:read", target="self", action=True),
+            ACLItem(privilege="fi.pvarki.arkia11nmodels.token:read", target="self", action=True),
             # Do we want to add users write privileges to their profile ?
-            # ACLItem(privilege="fi.arki.arkia11nmodels.user.profile:update", target="self", action=True),
-            # ACLItem(privilege="fi.arki.arkia11nmodels.user.displayname:update", target="self", action=True),
+            # ACLItem(privilege="fi.pvarki.arkia11nmodels.user.profile:update", target="self", action=True),
+            # ACLItem(privilege="fi.pvarki.arkia11nmodels.user.displayname:update", target="self", action=True),
             # email and sms are critical fields used for token delivery so if someone manages to steal one token
             # they must not be allowed to change the delivery addresses for a full account takeover
         ]

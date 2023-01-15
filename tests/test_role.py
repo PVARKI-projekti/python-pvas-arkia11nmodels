@@ -45,21 +45,21 @@ async def test_role_pydantic_validators() -> None:
     assert DBRole.schema()
     validaclitem = ACLItem.parse_obj(
         {
-            "privilege": "fi.arki.superadmin",
+            "privilege": "fi.pvarki.superadmin",
             "action": True,
         }
     )
     assert validaclitem
     with pytest.raises(ValidationError):
         invalidaclitem = ACLItem.parse_obj(
-            {"privilege": "fi.arki.superadmin", "action": True, "extrafield": "this should not be"}
+            {"privilege": "fi.pvarki.superadmin", "action": True, "extrafield": "this should not be"}
         )
         assert not invalidaclitem
 
     validacl_sequence = ACL(
         [
             {
-                "privilege": "fi.arki.superadmin",
+                "privilege": "fi.pvarki.superadmin",
                 "action": True,
             }
         ]
@@ -74,7 +74,7 @@ async def test_role_pydantic_validators() -> None:
         displayname="Suur-Mestarit",
         acl=[
             {
-                "privilege": "fi.arki.superadmin",
+                "privilege": "fi.pvarki.superadmin",
                 "action": True,
             }
         ],
@@ -84,12 +84,12 @@ async def test_role_pydantic_validators() -> None:
     assert pdcrole.displayname == exported["displayname"]
     ser = pdcrole.json()
     deser = json.loads(ser)
-    assert deser["acl"][0]["privilege"] == "fi.arki.superadmin"
+    assert deser["acl"][0]["privilege"] == "fi.pvarki.superadmin"
 
     with pytest.raises(ValidationError):
         invalidrole = RoleCreate(
             displayname="Suur-Mestarit",
-            acl=[{"privilege": "fi.arki.superadmin", "action": True, "nosuchfield": "this should not be"}],
+            acl=[{"privilege": "fi.pvarki.superadmin", "action": True, "nosuchfield": "this should not be"}],
         )
         assert not invalidrole
 
@@ -103,7 +103,7 @@ async def test_role_pydantic_db(dockerdb: str) -> None:
         displayname="Suur-Mestarit",
         acl=[
             {
-                "privilege": "fi.arki.superadmin",
+                "privilege": "fi.pvarki.superadmin",
                 "action": True,
             }
         ],

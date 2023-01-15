@@ -19,7 +19,7 @@ DEFAULT_PRIORITY = 1000
 class ACLItem(BaseModel, extra="forbid"):
     """ACL item"""
 
-    privilege: str = Field(description="Name of the privilege, something like fi.arki.superadmin")
+    privilege: str = Field(description="Name of the privilege, something like fi.pvarki.superadmin")
     action: Optional[bool] = Field(
         default=False, description="True for granting, False for denying, None for 'inherit'"
     )
