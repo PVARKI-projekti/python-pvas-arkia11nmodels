@@ -235,6 +235,8 @@ async def role_test_db(dockerdb: str) -> AsyncGenerator[RoleTestDbType, None]:
     await role_100.delete()
     await UserRole.delete.where(UserRole.role == role_1.pk).gino.status()
     await role_1.delete()
+    await user1.delete()
+    await user2.delete()
 
 
 @pytest.mark.asyncio
@@ -272,3 +274,17 @@ async def test_user_roles(role_test_db: RoleTestDbType) -> None:
     users_100 = await role_100.list_role_users()
     assert not user_in_lst(user2, users_100)
     assert user_in_lst(user1, users_100)
+
+
+@pytest.mark.asyncio
+async def test_acl_merge(role_test_db: RoleTestDbType) -> None:
+    """Test ACL merge works as expected"""
+    user1, user2, _role_1, _role_100, _role_1000 = role_test_db
+    # FIXME: add some ACLs to the roles
+    user1_acl = await Role.resolve_user_acl(user1)
+    LOGGER.debug("user1_acl={}".format(user1_acl))
+    user1_by_privilege = {item.privilege: item for item in user1_acl}
+    assert "fi.pvarki.arkia11nmodels.user:read" in user1_by_privilege
+
+    _user2_acl = await Role.resolve_user_acl(user2)
+    # FIXME: Check the merged ACLs are what we expect

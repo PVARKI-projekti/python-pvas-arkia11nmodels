@@ -8,7 +8,7 @@ import pendulum
 
 from .base import BaseModel, db
 from .user import User
-from ..schemas.role import DEFAULT_PRIORITY, ACL
+from ..schemas.role import DEFAULT_PRIORITY, ACL, ACLItem
 
 LOGGER = logging.getLogger(__name__)
 
@@ -105,9 +105,24 @@ class Role(BaseModel):
         return ret
 
     @classmethod
-    async def resolve_user_acl(cls, user: User) -> ACL:
+    async def resolve_user_acl(cls, user: User) -> List[ACLItem]:
         """Merge ACL from users' roles"""
-        raise NotImplementedError()
+        by_privilege = {item.privilege: item for item in User.default_acl}
+        prev_priority = 10000
+        async for role in cls.iter_user_roles(user):
+            for item in ACL(role.acl):
+                if item.privilege not in by_privilege:
+                    by_privilege[item.privilege] = item
+                    continue
+                if role.priority < prev_priority:  # lower priority number is more important
+                    by_privilege[item.privilege] = item
+                    continue
+                if item.action is False:
+                    by_privilege[item.privilege] = item  # DENY actions are more important
+                if not by_privilege[item.privilege] is False and item.privilege:
+                    by_privilege[item.privilege] = item
+            prev_priority = role.priority
+        return list(by_privilege.values())
 
 
 class UserRole(BaseModel):  # pylint: disable=R0903
