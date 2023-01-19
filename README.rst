@@ -77,6 +77,10 @@ Remember to change that architecture tag to arm64 if building on ARM::
     docker build --ssh default --target production -t arkia11nmodels:amd64-latest .
     docker run --rm -it -v /path/to/dotenv:/app/.env --name arkia11nmodels arkia11nmodels:amd64-latest
 
+Deployments and docker compositions should run it directly from Docker hub::
+
+    docker run --rm -it -v /path/to/dotenv:/app/.env --name arkia11nmodels pvarkiprojekti/arkia11nmodels:latest
+
 
 Development
 -----------
