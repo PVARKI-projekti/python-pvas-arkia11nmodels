@@ -4,6 +4,13 @@ arkia11nmodels
 
 Authorization related ORM models and Pydantic schemas
 
+Configuration
+-------------
+
+You need to configure some things even when running the development server locally to avoid accidents.
+
+See dotenv.example on what you need to put into your .env -file.
+
 
 Docker
 ------
