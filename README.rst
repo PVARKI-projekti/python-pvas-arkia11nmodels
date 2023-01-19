@@ -71,11 +71,12 @@ the "tox" target in the Dockerfile::
 Production docker
 ^^^^^^^^^^^^^^^^^
 
-There's a "production" target as well for running the CLI utilities, remember to change that
-architecture tag to arm64 if building on ARM::
+There's a "production" target as well for running the CLI utilities. It runs "alembic upgrade head" by default.
+Remember to change that architecture tag to arm64 if building on ARM::
 
-    docker build --ssh default --target production -t arkia11nmodels:latest .
-    docker run -it --name arkia11nmodels arkia11nmodels:amd64-latest
+    docker build --ssh default --target production -t arkia11nmodels:amd64-latest .
+    docker run --rm -it -v /path/to/dotenv:/app/.env --name arkia11nmodels arkia11nmodels:amd64-latest
+
 
 Development
 -----------
