@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "arkia11nmodels"
-version = "0.1.0"
+version = "1.0.0"
 description = "Authorization related ORM models and Pydantic schemas"
 authors = ["Eero af Heurlin <eero.afheurlin@iki.fi>"]
 homepage = "https://github.com/PVARKI-projekti/python-shop-arkia11nmodels"
@@ -33,10 +33,32 @@ exclude = '''
 )
 '''
 
+[tool.mypy]
+strict=true
+
+[[tool.mypy.overrides]]
+module="arkia11nmodels.models.*"  # Gino isn't properly typed yet
+disallow_subclassing_any=false
+
+[[tool.mypy.overrides]]
+module="arkia11nmodels.schemas.*"  # pydantic_collections has issues
+disallow_subclassing_any=false
+
+[[tool.mypy.overrides]]
+module="alembic.*"  # alembic generated stuff is all weird to mypy
+ignore_errors = true
+
+
 [tool.pytest.ini_options]
 junit_family="xunit2"
 addopts="--cov=arkia11nmodels --cov-fail-under=65 --cov-branch"
 asyncio_mode="strict"
+
+
+[tool.pylint.MASTER]
+ignore-paths = [
+    '^alembic/.*'
+]
 
 [tool.pylint.format]
 max-line-length = 120
@@ -45,7 +67,7 @@ max-line-length = 120
 max-parents = 10
 
 [tool.pylint.messages_control]
-disable=["fixme", "W1202", "C0330", "C0209"]
+disable=["fixme", "W1202", "C0209"]
 
 [tool.pylint.similarities]
 min-similarity-lines = 8
@@ -59,6 +81,18 @@ branch = true
 python = "^3.8"
 libadvian = "^1.0"
 click = "^8.0"
+gino = "^1.0"
+starlette = ">=0.22,<1.0"  # caret behaviour on 0.x is to lock to 0.x.*
+sqlalchemy-stubs = "^0.4"
+pendulum = "^2.1"
+pydantic = { version="^1.10", extras=["email"] }
+pydantic-collections = ">=0.4,<1.0"  # caret behaviour on 0.x is to lock to 0.x.*
+alembic = { version="^1.9", optional=true }
+psycopg2 = { version="^2.9", optional=true }
+
+[tool.poetry.extras]
+migrations = ["alembic", "psycopg2"]
+all = ["migrations"]
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.1"
@@ -72,6 +106,12 @@ pre-commit = "^2.17"
 pytest-asyncio = "^0.18"
 bump2version = "^1.0"
 detect-secrets = "^1.2"
+pytest-docker = "^1.0"
+docker-compose = "^1.29"
+# required for development
+alembic = { version="^1.9", optional=false }
+psycopg2 = { version="^2.9", optional=false }
+
 
 [build-system]
 requires = ["poetry-core>=1.2.0"]

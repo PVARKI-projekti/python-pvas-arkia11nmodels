@@ -4,6 +4,13 @@ arkia11nmodels
 
 Authorization related ORM models and Pydantic schemas
 
+Configuration
+-------------
+
+You need to configure some things even when running the development server locally to avoid accidents.
+
+See dotenv.example on what you need to put into your .env -file.
+
 
 Docker
 ------
@@ -36,7 +43,7 @@ Creating a development container
 Build image, create container and start it::
 
     docker build --ssh default --target devel_shell -t arkia11nmodels:devel_shell .
-    docker create --name arkia11nmodels_devel -v `pwd`":/app" -it `echo $DOCKER_SSHAGENT` arkia11nmodels:devel_shell
+    docker create --name arkia11nmodels_devel -v `pwd`":/app" -it `echo $DOCKER_SSHAGENT` --net host -v /var/run/docker.sock:/var/run/docker.sock arkia11nmodels:devel_shell
     docker start -i arkia11nmodels_devel
 
 pre-commit considerations
@@ -59,16 +66,21 @@ You can use the devel shell to run py.test when doing development, for CI use
 the "tox" target in the Dockerfile::
 
     docker build --ssh default --target tox -t arkia11nmodels:tox .
-    docker run --rm -it -v `pwd`":/app" `echo $DOCKER_SSHAGENT` arkia11nmodels:tox
+    docker run --rm -it -v `pwd`":/app" `echo $DOCKER_SSHAGENT`  --net host -v /var/run/docker.sock:/var/run/docker.sock arkia11nmodels:tox
 
 Production docker
 ^^^^^^^^^^^^^^^^^
 
-There's a "production" target as well for running the CLI utilities, remember to change that
-architecture tag to arm64 if building on ARM::
+There's a "production" target as well for running the CLI utilities. It runs "alembic upgrade head" by default.
+Remember to change that architecture tag to arm64 if building on ARM::
 
-    docker build --ssh default --target production -t arkia11nmodels:latest .
-    docker run -it --name arkia11nmodels arkia11nmodels:amd64-latest
+    docker build --ssh default --target production -t arkia11nmodels:amd64-latest .
+    docker run --rm -it -v /path/to/dotenv:/app/.env --name arkia11nmodels arkia11nmodels:amd64-latest
+
+Deployments and docker compositions should run it directly from Docker hub::
+
+    docker run --rm -it -v /path/to/dotenv:/app/.env --name arkia11nmodels pvarkiprojekti/arkia11nmodels:latest
+
 
 Development
 -----------
