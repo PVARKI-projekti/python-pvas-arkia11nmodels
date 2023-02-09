@@ -79,7 +79,7 @@ Remember to change that architecture tag to arm64 if building on ARM::
 
 Deployments and docker compositions should run it directly from Docker hub::
 
-    docker run --rm -it -v /path/to/dotenv:/app/.env --name arkia11nmodels pvarkiprojekti/arkia11nmodels:latest
+    docker run --rm -it -v /path/to/dotenv:/app/.env --name arkia11nmodels pvarki/arkia11nmodels:latest
 
 
 Development
