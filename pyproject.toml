@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "arkia11nmodels"
-version = "1.0.0"
+version = "1.0.1"
 description = "Authorization related ORM models and Pydantic schemas"
 authors = ["Eero af Heurlin <eero.afheurlin@iki.fi>"]
 homepage = "https://github.com/PVARKI-projekti/python-shop-arkia11nmodels"
